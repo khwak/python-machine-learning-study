@@ -1,11 +1,11 @@
 # python-machine-learning-study
 파이썬 머신러닝 스터디입니다.
 ## Commit Conventions
-Rules
+**Rules**
 
     [타입] Ch# - 커밋 메시지
 
-Types
+**Types**
 
 | 타입      | 설명 |
 |-----------|----------------|
