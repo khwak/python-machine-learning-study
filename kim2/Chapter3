@@ -1,0 +1,159 @@
+---
+
+### 분류의 성능 평가 지표
+
+- 정확도(Accuracy)
+- 오차행렬(Confusion Matrix)
+- 정밀도(Precision)
+- 재현율(Recall)
+- F1 스코어
+- ROC AUC
+
+---
+
+## 정확도(Accuracy)
+
+- 정확도 : 실제 데이터에서 예측 데이터가 얼마나 같은지를 판단하는 지표
+
+$$
+정확도(Accuracy) = \frac{예측\,결과가\,동일한\,데이터\,건수}{전체\,예측\,데이터\,건수}
+$$
+
+- 정확도는 불균형한 레이블 값 분포에서 ML 모델의 성능을 판단할 경우, 특정한 결과로 인해 정확도가 높게 나올 수 있어 적합한 평가 지표가 아님
+    - ex) titanic 생존자 예측, MNIST 데이터
+    - ex) MNIST 경우, predict()의 결과를 np.zeros()로 모두 0 값으로 반환해도 예측 정확도는 90%
+    
+
+---
+
+## 오차 행렬(Confusion Matrix)
+
+- 오차행렬 : 학습된 분류 모델이 예측을 수행하면서 헷갈리는 정도를 함께 보여주는 지표
+- 이진 분류의 예측 오류값과 어떤 유형의 예측 오류가 발생하는지 보여주는 지표
+
+![Screenshot_20231015_120910.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/aca0fd72-847c-4047-9930-7424108d0d5c/910774d3-56c4-43e0-90cf-6fe0f5520dfd/Screenshot_20231015_120910.jpg)
+
+- TN : 예측값을 Negative 값 0으로 예측했고 실제 값 역시 Negative 값 0
+- FP : 예측값을 Positive 값 1로 예측했고 실제 값은 Negative 값 0
+- FN : 예측값을 Negative 값 0으로 예측했고 실제 값은 Positive 값 1
+- TP : 예측값을 Positive 값 1로 예측했고 실제 값 역시 Positive 값 1
+
+- 오차 행렬을 구하기 위한 코드
+
+```python
+from sklearn.metrics import confusion_matrix
+
+confusion_matrix(실제 결과, 예측 결과)
+```
+
+- TP, TN, FP, FN 값은 Classifier 성능이 여러 면모를 판단할 수 있는 기반 정보를 제공함
+    - 성능 측정 지표인 정확도(Accuracy), 정밀도(Precision), 재현율(Recall) 값을 확인할 수 있음
+    
+
+$$
+정확도(Accuracy) = \frac{(TN+TP)}{TN+FP+FN+TP}
+$$
+
+---
+
+## 정밀도(Precision)
+
+- 정밀도 : 예측을 Positive로 한 대상 중에서 예측과 실제 값이 Positive로 일치한 데이터의 비율
+    - Positive 예측 성능을 더욱 정밀하게 측정하기 위한 평가 지표
+
+$$
+정밀도(Precision) = \frac{TP}{FP+TP}
+$$
+
+- 정밀도가 상대적으로 더 중요한 지표인 경우 : 실제 Negative 음성인 데이터 예측을  Positive로 잘못 판단하게 되면 업무상 큰 영향이 발생하는 경우
+    - ex) 스팸 메일 분류
+
+- 정밀도는 TP를 높이고 FP를 낮추는데 초점을 맞춤
+
+---
+
+## 재현율(Recall)
+
+- 재현율 : 실제 값이 Positive인 대상 중에서 예측과 실제 값이 Positive로 일치한 데이터의 비율
+    - 민감도(Sensitivity) 또는 TRP(True Positive Rate)라고도 불림
+
+$$
+재현율(Recall) = \frac{TP}{FN+TP}
+$$
+
+- 재현율이 상대적으로 더 중요한 지표인 경우 : 실제 Positive 양성인 데이터 예측을  Negative로 잘못 판단하게 되면 업무상 큰 영향이 발생하는 경우
+    - ex) 암 판단 모델, 금융 사기 적발 모델
+    
+    - 재현율은 TP를 높이고 FN을 낮추는데  초점을 맞춤
+    
+
+---
+
+## 정밀도/재현율 Trade-off
+
+- 정밀도와 재현율은 상호 보완적인 평가 지표이기 때문에 어느 한쪽을 강제로 높이면 다른 하나의 수치는 떨어지기 쉬움
+
+![Screenshot_20231015_131226.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/aca0fd72-847c-4047-9930-7424108d0d5c/80913d44-4d8f-4278-9af0-95a9e76f2428/Screenshot_20231015_131226.jpg)
+
+---
+
+## F1 스코어
+
+- F1 스코어 : 정밀도와 재현율을 결합한 지표
+- 정밀도와 재현율이 어느 한쪽으로 치우치치 않는 수치를 나타낼 때 상대적으로 높은 값을 가짐
+
+$$
+F1 = 2 * \frac{precision * recall}{precision + recall}
+$$
+
+- 오차 행렬을 구하기 위한 코드
+
+```python
+from sklearn.metrics import f1_score
+
+f1 = f1_score(실제 결과, 예측 결과)
+print('F1 스코어: {0:.4}'.format(f1))
+```
+
+---
+
+## ROC 곡선과 AUC
+
+- ROC 곡선 : FPR(Flase Positive Rate)이 변할 때 TPR(True Positive Rate)이 어떻게 변하는지 나타내는 곡선
+- FPR을 X축, TPR을 Y축으로 잡으면 FPR의 변화에 따른 TPR의 변화가 곡선 형태로 나타남
+
+- 민감도(TPR) : 실제값 Positive가 정확히 예측돼야 하는 수준을 나타냄(질병이 있는 사람은 질병이 있는 것으로 양성 판단)
+- 특이성(TNR) : 실제값 Negative가 정확히 예측돼야 하는 수준을 나타냄(질병이 없는 건강한 사람은 질병이 없는 것으로 음성 판단)
+- FPR : FP / (FP+TN) = 1-TNR (1-특이성)으로 나타낼 수 있음
+
+![Screenshot_20231015_125839.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/aca0fd72-847c-4047-9930-7424108d0d5c/a3e7a044-2d29-4857-866e-a7e0e96004da/Screenshot_20231015_125839.jpg)
+
+- ROC 곡선이 가운데 직선에 가까울수록 성능이 떨어지는 것이며, 멀어질수록 성능이 뛰어난 것
+- ROC 곡선은 FPR을 0부터 1까지 변경하면서 TPR의 변화 값을 구함
+    - 분류 결정 임계값을 변경시키면서 FPR을 0부터 1까지 변경할 수 있음
+
+$$
+FPR = \frac{FP}{(FP+TN)}
+$$
+
+- FPR을 0으로 만들려면 임곗값을 1로 지정하면 됨
+    - 분류기의 Positive 확률 기준이 너무 높아서 Positive로 예측할 수 없음
+    - 아예 Positive로 예측하지 않기 때문에  FP값이 0이 되어 FPR이 0이 됨
+- fPR을 1로 만들려면 임곗값을 0으로 지정하면 됨
+    - 분류기의 Positive 확률 기준이 너무 낮아서 다 Positive로 예측함
+    - 아예 Negative 예측이 없기 때문에 TN이 0이 되고 FPR 값은 1이 됨
+
+- ROC 곡선을 구하기 위한 파라미터 및 반환 값
+
+| 입력 파라미터 | y_true : 실제 클래스 값 array (array shape= [데이터 건수])
+y_score : predict_proba()의 반환 값 array에서 Positive 칼럼의 예측 확률이 보통 사용됨         array, shape = [n_samples] |
+| --- | --- |
+| 반환 값 | fpr : fpr 값을 array로 반환
+tpr : tpr 값을 array로 반환
+thresholds : threshod 값 array |
+- roc_curve() 결과를 확인하면 임곗값이 1에 가까운 값에서 점점 작아지면서 FPR이 점점 커짐
+
+- AUC값 : ROC 곡선 밑의 면적을 구한 것으로서 일반적으로 1에 가까울수록 좋은 수치
+- AUC 값이 커지려면 FPR이 작은 상태에서 얼마나 큰 TPR을 얻어야 함
+
+![Screenshot_20231015_131155.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/aca0fd72-847c-4047-9930-7424108d0d5c/1d035b3e-bd65-43bd-b4c5-c90d26c12762/Screenshot_20231015_131155.jpg)
