@@ -1,0 +1,96 @@
+## 01 분류(Classification)의 개요
+
+### 분류(Classification)란?
+
+- 학습 데이터로 주어진 데이터의 피처와 레이블값(결정 값, 클래스 값)을 머신러닝 알고리즘으로 학습해 모델을 생성하고, 생성된 모델에 새로운 데이터 값이 주어졌을 때 미지의 레이블 값을 예측하는 것
+- **기존 데이터가 어떤 레이블에 속하는지 패턴을 알고리즘으로 인지한 뒤에 새롭게 관측된 데이터에 대한 레이블을 판별**
+- 사용되는 머신러닝 알고리즘 : 나이브 베이즈, 로지스틱 회귀, 결정 트리, 서포트 벡터 머신, 최소 근접 알고리즘, 신경망, 앙상블
+
+---
+
+## 02 결정 트리
+
+### 결정 트리(Decision Tree)란?
+
+- 데이터에 있는 규칙을 학습을 통해 자동으로 찾아내 트리 기반의 분류 규칙을 만드는 것
+- 성능을 좌우하는 요인 : 데이터의 어떤 기준을 바탕으로 규칙을 만들어야 가장 효율적인 분류가 될 것인지
+- 결정 트리의 구조 :
+
+![데이터 세트에 피처가 있고 이러한 피처가 결합해 규칙 조건을 만들 때마다 규칙 노드가 만들어짐](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/0b44cbcd-61d4-4bdc-bc61-343d002625d0/Untitled.png)
+
+데이터 세트에 피처가 있고 이러한 피처가 결합해 규칙 조건을 만들 때마다 규칙 노드가 만들어짐
+
+- 트리의 깊이(depth)가 깊어질수록 결정 트리의 예측 성능이 저하될 가능성이 높음 (과적합으로 이어질 수 있음)
+- 최대한 균일한 데이터 세트를 구성할 수 있도록 분할해야 적은 결정 노트로 높은 예측 정확도를 가질 수 있음
+- 결정 트리는 데이터 세트를 분할하는 데 가장 좋은 조건, 즉 정보 이득이 높거나 지니 계수가 낮은 조건을 찾아서 자식 트리 노드에 걸쳐 반복적으로 분할함
+    - 정보 이득이란? 1 - 엔트로피 지수로, 정보 이득이 높은 속성을 기준으로 분할함
+    - 지니 계수란? 정보의 균일도를 측정하는 방법으로, 지니 계수가 낮을수록 데이터 균일도가 높은 것으로 해석해 지니 계수가 낮은 속성을 기준으로 분할함
+    
+    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6452798b-323d-4025-96d1-94836cbc552c/Untitled.png)
+    
+
+### 결정 트리 모델의 특징
+
+| 결정 트리 장점 | 결정 트리 단점 |
+| --- | --- |
+| - 쉽다, 직관적이다 | - 과적합으로 알고리즘 성능이 떨어진다 (트리의 크기를 사전에 제한하는 튜닝이 필요 |
+| - 피처의 스케일링이나 정규화 등의 사전 가공 영향도가 크지 않다 |  |
+
+### 결정 트리 파라미터
+
+| 파라미터 명 | 설명 |
+| --- | --- |
+| min_samples_split | - 노드를 분할하기 위한 최소한의 샘플 데이터 수로 과적합을 제어하는데 사용됨
+- 디폴트는 2이고 작게 설정할수록 분할되는 노드가 많아져서 과적합 가능성 증가
+- 과적합을 제어, 1로 설정할 경우 분할되는 노드가 많아져서 과적합 가능성 증가 |
+| min_samples_leaf | - 말단 노드(leaf)가 되기 위한 최소한의 샘플 데이터 수
+- 과적합 제어 용도, 그러나 비대칭적 데이터의 경우 특정 클래스의 데이터가 극도로 작을 수 있으므로 이 경우는 작게 설정 필요 |
+| max_features | - 최적의 분할을 위해 고려할 최대 피처 개수, 디폴트는 None으로 데이터 세트의 모든 피처를 사용해 분할 수행
+- int 형을 지정하면 대상 피처의 개수, float 형으로 지정하면 전체 피처 중 대상 피처의 퍼센트 |
+| max_depth | - 트리의 최대 깊이를 규정
+- 디폴트는 None, None으로 설정하면 완벽하게 클래스 결정 값이 될 때까지 깊이를 계속 키우며 분할하거나 노드가 가지는 데이터 개수가 min_samples_split보다 작아질 때까지 계속 깊이를 증가시킴
+- 깊이가 깊어지면서 최대 분할하여 과적합할 수 있으므로 적절한 갑스로 제어 필요 |
+| max_leaf_nodes | - 말단 노드(leaf)의 최대 개수 |
+
+### 결정 트리 모델의 시각화
+
+- `Graphviz` 패키지를 사용하면 결정 트리 알고리즘에 어떠한 규칙을 가지고 트리를 생성하는지 시각적으로 보여줄 수 있음
+- `export_graphivz()`는 함수 인자로 학습이 완료된 Estimator, 피처의 이름 리스트, 레이블 이름 리스트를 입력하면 학습된 결정 트리 규칙을 실제 트리 형태로 시각해함
+
+```python
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+import warnings
+warnings.filterwarnings('ignore')
+
+# DecisionTree Classifier 생성
+dt_clf = DecisionTreeClassifier(random_state=156)
+
+# 붓꽃 데이터를 로딩하고, 학습과 테스트 데이터 셋으로 분리
+iris_data = load_iris()
+X_train , X_test , y_train , y_test = train_test_split(iris_data.data, iris_data.target,
+                                                       test_size=0.2,  random_state=11)
+
+# DecisionTreeClassifer 학습. 
+dt_clf.fit(X_train , y_train)
+```
+
+```python
+from sklearn.tree import export_graphviz
+
+# export_graphviz()의 호출 결과로 out_file로 지정된 tree.dot 파일을 생성함. 
+export_graphviz(dt_clf, out_file="tree.dot", class_names=iris_data.target_names , \
+feature_names = iris_data.feature_names, impurity=True, filled=True)
+```
+
+```python
+import graphviz
+
+# 위에서 생성된 tree.dot 파일을 Graphviz 읽어서 Jupyter Notebook상에서 시각화 
+with open("tree.dot") as f:
+    dot_graph = f.read()
+graphviz.Source(dot_graph)
+```
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/862b3a98-8cf9-4418-81cf-7671e6d1437c/Untitled.png)
